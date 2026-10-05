@@ -1,0 +1,1395 @@
+[
+  {
+    "bucket_name": "bucket-case-27",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 1825
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 31
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-05",
+    "versioning": "Suspended",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 1095
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "analytics/",
+            "Tags": [
+              {
+                "Key": "retention",
+                "Value": "standard"
+              }
+            ],
+            "ObjectSizeGreaterThan": 262144
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 90,
+            "StorageClass": "GLACIER_IR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-10",
+    "versioning": "Disabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      },
+      {
+        "ID": "abort-mpu-too-late",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 8
+        }
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-15",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "large-objects/",
+            "Tags": [
+              {
+                "Key": "data-class",
+                "Value": "cold"
+              }
+            ],
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-20",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 365
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-expiring",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 365,
+            "StorageClass": "GLACIER_IR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-25",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3651
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-03",
+    "versioning": "Disabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 90
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-08",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-13",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-18",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 365
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-shared-ia",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "shared/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "STANDARD_IA"
+          }
+        ]
+      },
+      {
+        "ID": "transition-shared-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "shared/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 120,
+            "StorageClass": "GLACIER"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-23",
+    "versioning": "Suspended",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 1825
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "api-logs/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-01",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 2555
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-std-ia",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "customer-data/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "STANDARD_IA"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-06",
+    "versioning": "Disabled",
+    "Rules": [
+      {
+        "ID": "expire-reports",
+        "Status": "Enabled",
+        "Filter": {
+          "Prefix": "reports/"
+        },
+        "Expiration": {
+          "Days": 2555
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "reports/",
+            "Tags": [
+              {
+                "Key": "environment",
+                "Value": "production"
+              }
+            ],
+            "ObjectSizeGreaterThan": 262144
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-11",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {
+          "Prefix": "uploads/"
+        },
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "cold-content/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 90,
+            "StorageClass": "GLACIER"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-16",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-expiring",
+        "Status": "Enabled",
+        "Filter": {
+          "Prefix": "research/"
+        },
+        "Transitions": [
+          {
+            "Days": 365,
+            "StorageClass": "GLACIER_IR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-21",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-archive",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "legal-records/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "DEEP_ARCHIVE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-26",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 1825
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "ObjectSizeGreaterThan": 131072
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-04",
+    "versioning": "Disabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 365
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-09",
+    "versioning": "Disabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 730
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 7
+        }
+      },
+      {
+        "ID": "transition-onezone",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "user-uploads/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "ONEZONE_IA"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-14",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 4000
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-std-ia",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "long-retention/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "STANDARD_IA"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-19",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "media/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "GLACIER_IR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-24",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "cold-archive/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-02",
+    "versioning": "Disabled",
+    "Rules": []
+  },
+  {
+    "bucket_name": "bucket-case-07",
+    "versioning": "Suspended",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 1825
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "versions/",
+            "Tags": [
+              {
+                "Key": "tier",
+                "Value": "archive"
+              }
+            ],
+            "ObjectSizeGreaterThan": 1048576
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 90,
+            "StorageClass": "GLACIER_IR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-12",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-archive",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "compliance-archive/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "DEEP_ARCHIVE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-17",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-it",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "hot/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 0,
+            "StorageClass": "INTELLIGENT_TIERING"
+          }
+        ]
+      },
+      {
+        "ID": "transition-cold-archive",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "cold-archive/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 60,
+            "StorageClass": "DEEP_ARCHIVE"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-22",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 80
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "archive/",
+            "Tags": [
+              {
+                "Key": "retention",
+                "Value": "short"
+              }
+            ],
+            "ObjectSizeGreaterThan": 1048576
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "GLACIER"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "bucket_name": "bucket-case-28",
+    "versioning": "Enabled",
+    "Rules": [
+      {
+        "ID": "expire-current",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "Days": 3650
+        }
+      },
+      {
+        "ID": "expire-noncurrent",
+        "Status": "Enabled",
+        "Filter": {},
+        "NoncurrentVersionExpiration": {
+          "NoncurrentDays": 30
+        }
+      },
+      {
+        "ID": "expire-delete-markers",
+        "Status": "Enabled",
+        "Filter": {},
+        "Expiration": {
+          "ExpiredObjectDeleteMarker": true
+        }
+      },
+      {
+        "ID": "abort-mpu",
+        "Status": "Enabled",
+        "Filter": {},
+        "AbortIncompleteMultipartUpload": {
+          "DaysAfterInitiation": 1
+        }
+      },
+      {
+        "ID": "transition-shared-ia",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "shared/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "STANDARD_IA"
+          }
+        ]
+      },
+      {
+        "ID": "transition-shared-glacier",
+        "Status": "Enabled",
+        "Filter": {
+          "And": {
+            "Prefix": "shared/",
+            "ObjectSizeGreaterThan": 131072
+          }
+        },
+        "Transitions": [
+          {
+            "Days": 30,
+            "StorageClass": "GLACIER"
+          }
+        ]
+      }
+    ]
+  }
+]

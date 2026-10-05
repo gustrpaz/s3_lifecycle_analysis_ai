@@ -1,0 +1,1149 @@
+[
+  {
+    "case_id": "CASE_01",
+    "scenario": "NC-01",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 2555 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-std-ia",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "customer-data/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_02",
+    "scenario": "NC-01",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-01"],
+    "expected_recommendation": "Adicionar transição para Intelligent-Tiering no dia 0 e expiração em 3650 dias.",
+    "versioning": "Disabled",
+    "lifecycle_configuration": { "Rules": [] }
+  },
+  {
+    "case_id": "CASE_03",
+    "scenario": "NC-02",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 90 }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_04",
+    "scenario": "NC-02",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-02"],
+    "expected_recommendation": "Adicionar transição para Intelligent-Tiering no dia 0.",
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 365 }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_05",
+    "scenario": "NC-03",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Suspended",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 1095 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "analytics/",
+              "Tags": [{ "Key": "retention", "Value": "standard" }],
+              "ObjectSizeGreaterThan": 262144
+            }
+          },
+          "Transitions": [{ "Days": 90, "StorageClass": "GLACIER_IR" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_06",
+    "scenario": "NC-03",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-03"],
+    "expected_recommendation": "Adicionar expiração em 3650 dias ou regra de arquivamento sem filtro.",
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-reports",
+          "Status": "Enabled",
+          "Filter": { "Prefix": "reports/" },
+          "Expiration": { "Days": 2555 }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "reports/",
+              "Tags": [{ "Key": "environment", "Value": "production" }],
+              "ObjectSizeGreaterThan": 262144
+            }
+          },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_07",
+    "scenario": "NC-04",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Suspended",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 1825 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "versions/",
+              "Tags": [{ "Key": "tier", "Value": "archive" }],
+              "ObjectSizeGreaterThan": 1048576
+            }
+          },
+          "Transitions": [{ "Days": 90, "StorageClass": "GLACIER_IR" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_08",
+    "scenario": "NC-04",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-04"],
+    "expected_recommendation": "Adicionar NoncurrentVersionExpiration em até 30 dias, sem filtro.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_09",
+    "scenario": "NC-05",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 730 }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 7 }
+        },
+        {
+          "ID": "transition-onezone",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "user-uploads/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "ONEZONE_IA" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_10",
+    "scenario": "NC-05",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-05"],
+    "expected_recommendation": "Adicionar AbortIncompleteMultipartUpload com DaysAfterInitiation=7.",
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        },
+        {
+          "ID": "abort-mpu-too-late",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 8 }
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_11",
+    "scenario": "NC-06",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": { "Prefix": "uploads/" },
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "cold-content/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 90, "StorageClass": "GLACIER" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_12",
+    "scenario": "NC-06",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-06"],
+    "expected_recommendation": "Adicionar Expiration com ExpiredObjectDeleteMarker=true.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-archive",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "compliance-archive/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "DEEP_ARCHIVE" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_13",
+    "scenario": "NC-07",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_14",
+    "scenario": "NC-07",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-07"],
+    "expected_recommendation": "Reduzir a expiração para 3650 dias.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 4000 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-std-ia",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "long-retention/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_15",
+    "scenario": "NC-09",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "large-objects/",
+              "Tags": [{ "Key": "data-class", "Value": "cold" }],
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_16",
+    "scenario": "NC-09",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-09"],
+    "expected_recommendation": "Adicionar ObjectSizeGreaterThan=131072 ao filtro da regra de transição.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-expiring",
+          "Status": "Enabled",
+          "Filter": { "Prefix": "research/" },
+          "Transitions": [{ "Days": 365, "StorageClass": "GLACIER_IR" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_17",
+    "scenario": "NC-10",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "hot/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        },
+        {
+          "ID": "transition-cold-archive",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "cold-archive/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 60, "StorageClass": "DEEP_ARCHIVE" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_18",
+    "scenario": "NC-10",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 365 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-shared-ia",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
+        },
+        {
+          "ID": "transition-shared-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 120, "StorageClass": "GLACIER" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_19",
+    "scenario": "NC-11",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "media/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "GLACIER_IR" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_20",
+    "scenario": "NC-11",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-11"],
+    "expected_recommendation": "Remover a regra de transição que ocorre no mesmo dia da expiração.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 365 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-expiring",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 365, "StorageClass": "GLACIER_IR" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_21",
+    "scenario": "NC-12",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-archive",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "legal-records/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "DEEP_ARCHIVE" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_22",
+    "scenario": "NC-12",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-12"],
+    "expected_recommendation": "Ajustar a expiração ou a próxima transição para respeitar a duração mínima da classe.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 80 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "archive/",
+              "Tags": [{ "Key": "retention", "Value": "short" }],
+              "ObjectSizeGreaterThan": 1048576
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "GLACIER" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_23",
+    "scenario": "NC-13",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Suspended",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 1825 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "api-logs/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_24",
+    "scenario": "NC-13",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-13"],
+    "expected_recommendation": "Definir Transition.Days=0 para regras de Intelligent-Tiering.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "cold-archive/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_25",
+    "scenario": "NC-07 + NC-13",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-07", "NC-13"],
+    "expected_recommendation": "Reduzir a expiração para 3650 dias e definir a transição para Intelligent-Tiering no dia 0.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3651 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 30, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_26",
+    "scenario": "NC-08",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 1825 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_27",
+    "scenario": "NC-08",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-08"],
+    "expected_recommendation": "Reduzir NoncurrentVersionExpiration.NoncurrentDays para no máximo 30 dias.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 1825 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 31 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
+          "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_28",
+    "scenario": "NC-10",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-10"],
+    "expected_recommendation": "Consolidar as regras ou remover a transição concorrente menos restritiva.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "Days": 3650 }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": { "NoncurrentDays": 30 }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": { "ExpiredObjectDeleteMarker": true }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
+        },
+        {
+          "ID": "transition-shared-ia",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
+        },
+        {
+          "ID": "transition-shared-glacier",
+          "Status": "Enabled",
+          "Filter": {
+            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+          },
+          "Transitions": [{ "Days": 30, "StorageClass": "GLACIER" }]
+        }
+      ]
+    }
+  }
+]
