@@ -4,7 +4,7 @@ from typing import Any
 
 STORAGE_CLASS_MIN_DAYS = {
     "STANDARD": 0,
-    "INTELLIGENT_TIERING": 6,
+    "INTELLIGENT_TIERING": 0,
     "STANDARD_IA": 30,
     "ONEZONE_IA": 30,
     "GLACIER_IR": 90,
