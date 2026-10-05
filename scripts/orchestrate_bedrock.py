@@ -94,9 +94,10 @@ def build_system_message(
     return system_message_type(content=content)
 
 
-def create_chat_model(model_id: str, region: str | None, max_tokens: int) -> Any:
+def create_chat_model(model_id: str, region: str | None, max_tokens: int, read_timeout: int) -> Any:
     try:
         chat_bedrock_converse = import_module("langchain_aws").ChatBedrockConverse
+        botocore_config = import_module("botocore.config").Config
     except ImportError as exc:
         raise RuntimeError(
             "Dependências ausentes. Instale-as com: pip install -r requirements.txt"
@@ -106,6 +107,7 @@ def create_chat_model(model_id: str, region: str | None, max_tokens: int) -> Any
         "model_id": model_id,
         "temperature": 0,
         "max_tokens": max_tokens,
+        "config": botocore_config(read_timeout=read_timeout, connect_timeout=10,retries={"max_attempts": 3, "mode": "standard"}),
     }
     if region:
         model_options["region_name"] = region
@@ -146,8 +148,11 @@ def parse_json_response(text: str) -> dict[str, Any]:
     fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", candidate, flags=re.DOTALL | re.IGNORECASE)
     if fenced:
         candidate = fenced.group(1)
+    start = candidate.find("{")
+    if start < 0:
+        raise ValueError("A resposta do modelo não contém um objeto JSON.")
     try:
-        parsed = json.loads(candidate)
+        parsed, _ = json.JSONDecoder().raw_decode(candidate[start:])
     except json.JSONDecodeError as exc:
         raise ValueError(f"A resposta do modelo não é JSON válido: {exc}") from exc
     if not isinstance(parsed, dict):
@@ -221,7 +226,7 @@ def analyze_cases(args: argparse.Namespace) -> int:
             raise ValueError("--limit deve ser maior que zero.")
         records = records[: args.limit]
 
-    model = create_chat_model(args.model_id, args.region, args.max_tokens)
+    model = create_chat_model(args.model_id, args.region, args.max_tokens, args.read_timeout)
     system_message = build_system_message(knowledge_base, args.cache, args.cache_ttl)
     output_path: Path = args.output
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -306,7 +311,7 @@ def generate_script(args: argparse.Namespace) -> int:
     if args.instructions_file:
         extra = args.instructions_file.read_text(encoding="utf-8")
 
-    model = create_chat_model(args.model_id, args.region, args.max_tokens)
+    model = create_chat_model(args.model_id, args.region, args.max_tokens, args.read_timeout)
     system_message = build_system_message(knowledge_base, args.cache, args.cache_ttl)
     user_prompt = render_script_prompt(template, extra)
     (
@@ -317,6 +322,10 @@ def generate_script(args: argparse.Namespace) -> int:
     ) = invoke_model(model, system_message, user_prompt)
 
     generated = response_text(response)
+    try:
+        compile(generated, str(args.output or "<generated_script>"), "exec")
+    except SyntaxError as exc:
+        raise ValueError(f"O script gerado não é sintaticamente válido: {exc}") from exc
 
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -343,7 +352,7 @@ def generate_script(args: argparse.Namespace) -> int:
 def add_model_options(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--model-id",
-        default=os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-opus-5"),
+        default=os.getenv("BEDROCK_MODEL_ID", "us.anthropic.claude-opus-5-5"),
         help="ID do modelo ou inference profile do Bedrock.",
     )
     parser.add_argument(
@@ -352,6 +361,7 @@ def add_model_options(parser: argparse.ArgumentParser) -> None:
         help="Região AWS; usa AWS_REGION/AWS_DEFAULT_REGION ou a configuração AWS padrão.",
     )
     parser.add_argument("--max-tokens", type=int, default=4096)
+    parser.add_argument("--read-timeout", type=int, default=900, help="Tempo máximo, em segundos, aguardando a resposta do Bedrock (padrão: 900).")
     parser.add_argument("--no-cache", dest="cache", action="store_false")
     parser.set_defaults(cache=True)
     parser.add_argument("--cache-ttl", choices=("5m", "1h"), default="5m")
