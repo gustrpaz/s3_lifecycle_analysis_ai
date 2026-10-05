@@ -65,3 +65,7 @@ ser uma lista vazia e `conforme` deve ser `true`.
 
 O código deve ser implementado exclusivamente a partir da especificação
 do KB.
+
+- Retorne somente o código Python, sem blocos Markdown ou explicações.
+- Entregue um arquivo executável e sintaticamente completo, incluindo o ponto de entrada da CLI.
+- Priorize a completude: use implementação concisa e evite comentários, docstrings e seções decorativas extensas que consumam o limite de saída.

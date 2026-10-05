@@ -1,0 +1,837 @@
+[
+  {
+    "bucket_name": "bucket-case-01",
+    "analysis": {
+      "bucket_name": "bucket-case-01",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 2555 dias, que é superior a 180 dias. A única regra de transição existente ('transition-std-ia') possui filtro restrito ao prefixo 'customer-data/' e tamanho mínimo de 128 KB, portanto não há transição de escopo global que cubra todos os objetos sujeitos à expiração de 2555 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3626,
+      "output_tokens": 224,
+      "total_tokens": 3850,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:55:03.260583+00:00",
+    "finished_at": "2026-10-05T17:55:16.840019+00:00",
+    "duration_ms": 13579
+  },
+  {
+    "bucket_name": "bucket-case-02",
+    "analysis": {
+      "bucket_name": "bucket-case-02",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-01",
+          "descricao": "Ausência de regras de Lifecycle",
+          "justificativa": "O bucket não possui nenhuma regra de Lifecycle habilitada. A lista de regras está vazia, o que significa que não há nenhuma regra ativa para gerenciar o ciclo de vida dos objetos."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3289,
+      "output_tokens": 164,
+      "total_tokens": 3453,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:57:36.128195+00:00",
+    "finished_at": "2026-10-05T17:57:47.114606+00:00",
+    "duration_ms": 10986
+  },
+  {
+    "bucket_name": "bucket-case-03",
+    "analysis": {
+      "bucket_name": "bucket-case-03",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-03",
+          "descricao": "Ausência de expiração para versões atuais",
+          "justificativa": "A regra 'expire-current' possui expiração configurada com Days: 90 e filtro vazio (escopo global), o que atende ao critério NC-03. Portanto, NC-03 NÃO se aplica. Revisando: existe regra de expiração para versões atuais com escopo global. NC-03 não é aplicável."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3403,
+      "output_tokens": 532,
+      "total_tokens": 3935,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:13:35.163787+00:00",
+    "finished_at": "2026-10-05T18:13:51.752561+00:00",
+    "duration_ms": 16589
+  },
+  {
+    "bucket_name": "bucket-case-04",
+    "analysis": {
+      "bucket_name": "bucket-case-04",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 365 dias, que é superior a 180 dias, porém não existe nenhuma regra de transição configurada. Objetos permanecerão na classe STANDARD durante todo o período até a expiração, representando oportunidade de otimização financeira perdida."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3403,
+      "output_tokens": 198,
+      "total_tokens": 3601,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:56:21.004510+00:00",
+    "finished_at": "2026-10-05T17:56:40.314784+00:00",
+    "duration_ms": 19310
+  },
+  {
+    "bucket_name": "bucket-case-05",
+    "analysis": {
+      "bucket_name": "bucket-case-05",
+      "versioning": "Suspended",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 1095 dias (superior a 180 dias). A única regra de transição existente ('transition-glacier') possui filtro restritivo (prefixo 'analytics/', tag 'retention=standard' e tamanho mínimo de 262144 bytes), portanto não há transição de escopo global que cubra todos os objetos sujeitos à expiração de 1095 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3652,
+      "output_tokens": 227,
+      "total_tokens": 3879,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:53:40.152371+00:00",
+    "finished_at": "2026-10-05T17:53:50.043248+00:00",
+    "duration_ms": 9891
+  },
+  {
+    "bucket_name": "bucket-case-06",
+    "analysis": {
+      "bucket_name": "bucket-case-06",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-03",
+          "descricao": "Ausência de expiração para versões atuais com escopo global",
+          "justificativa": "A única regra de expiração existente (expire-reports) possui filtro de prefixo 'reports/', portanto não possui escopo global. Não existe regra de expiração para versões atuais sem filtro que cubra todos os objetos do bucket."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3553,
+      "output_tokens": 183,
+      "total_tokens": 3736,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:55:16.840494+00:00",
+    "finished_at": "2026-10-05T17:55:29.904562+00:00",
+    "duration_ms": 13064
+  },
+  {
+    "bucket_name": "bucket-case-07",
+    "analysis": {
+      "bucket_name": "bucket-case-07",
+      "versioning": "Suspended",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 1825 dias para versões atuais com escopo global (sem filtro). A única regra de transição existente ('transition-glacier') possui filtro restritivo (Prefix 'versions/' + Tag tier=archive + ObjectSizeGreaterThan 1048576), portanto não existe transição de escopo global que atenda objetos sujeitos à expiração global de 1825 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3653,
+      "output_tokens": 229,
+      "total_tokens": 3882,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:01:52.696692+00:00",
+    "finished_at": "2026-10-05T18:02:06.088746+00:00",
+    "duration_ms": 13393
+  },
+  {
+    "bucket_name": "bucket-case-08",
+    "analysis": {
+      "bucket_name": "bucket-case-08",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-04",
+          "descricao": "Ausência de expiração para versões não atuais",
+          "justificativa": "O versionamento está habilitado (Enabled), porém não existe nenhuma regra habilitada com NoncurrentVersionExpiration de escopo global e sem retenção explícita de versões não atuais mais novas. Nenhuma das quatro regras presentes (expire-current, expire-delete-markers, abort-mpu, transition-it) contém configuração de NoncurrentVersionExpiration."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3546,
+      "output_tokens": 215,
+      "total_tokens": 3761,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:01:14.586777+00:00",
+    "finished_at": "2026-10-05T18:01:27.831716+00:00",
+    "duration_ms": 13246
+  },
+  {
+    "bucket_name": "bucket-case-09",
+    "analysis": {
+      "bucket_name": "bucket-case-09",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 730 dias (superior a 180 dias). A única regra de transição existente ('transition-onezone') possui filtro restritivo (prefixo 'user-uploads/' e tamanho maior que 128KB), portanto não há transição de escopo global que cubra todos os objetos sujeitos à expiração de 730 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3512,
+      "output_tokens": 217,
+      "total_tokens": 3729,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:13:51.754472+00:00",
+    "finished_at": "2026-10-05T18:14:01.293050+00:00",
+    "duration_ms": 9539
+  },
+  {
+    "bucket_name": "bucket-case-10",
+    "analysis": {
+      "bucket_name": "bucket-case-10",
+      "versioning": "Disabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias, porém a única transição existente ('transition-it') possui filtro ObjectSizeGreaterThan de 131072 bytes, não sendo de escopo global. Objetos menores que 128 KB permanecem em STANDARD por 3650 dias sem nenhuma transição aplicável."
+        },
+        {
+          "codigo": "NC-05",
+          "descricao": "Ausência de controle sobre Multipart Uploads incompletos dentro do período de até 7 dias",
+          "justificativa": "A regra 'abort-mpu-too-late' configura AbortIncompleteMultipartUpload com DaysAfterInitiation igual a 8 dias, excedendo o limite de 7 dias definido no critério."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3495,
+      "output_tokens": 321,
+      "total_tokens": 3816,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:53:50.043860+00:00",
+    "finished_at": "2026-10-05T17:54:03.769267+00:00",
+    "duration_ms": 13725
+  },
+  {
+    "bucket_name": "bucket-case-11",
+    "analysis": {
+      "bucket_name": "bucket-case-11",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias para versões atuais com escopo global (Filter vazio). Não existe nenhuma regra de transição com escopo global que se aplique a esses mesmos objetos. A única regra de transição existente ('transition-glacier') possui filtro restrito ao prefixo 'cold-content/' e tamanho maior que 128KB, não cobrindo todos os objetos sujeitos à expiração de 3650 dias."
+        },
+        {
+          "codigo": "NC-05",
+          "descricao": "Ausência de controle sobre Multipart Uploads incompletos",
+          "justificativa": "A regra 'abort-mpu' possui filtro restrito ao prefixo 'uploads/', portanto não possui escopo global. Não existe uma regra habilitada de AbortIncompleteMultipartUpload com escopo global (sem filtro) que cubra todos os Multipart Uploads incompletos do bucket dentro do período de até 7 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3633,
+      "output_tokens": 375,
+      "total_tokens": 4008,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:55:29.905119+00:00",
+    "finished_at": "2026-10-05T17:55:41.982099+00:00",
+    "duration_ms": 12077
+  },
+  {
+    "bucket_name": "bucket-case-12",
+    "analysis": {
+      "bucket_name": "bucket-case-12",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias, que é superior a 180 dias. A única regra de transição existente ('transition-archive') possui filtro restrito ao prefixo 'compliance-archive/' e tamanho mínimo de 128 KB, portanto não há transição de escopo global que atenda objetos fora desse filtro antes da expiração."
+        },
+        {
+          "codigo": "NC-06",
+          "descricao": "Ausência de expiração de Delete Markers",
+          "justificativa": "O versionamento está habilitado (Enabled) e não existe nenhuma regra configurada com ExpiredObjectDeleteMarker para tratar Delete Markers expirados."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3569,
+      "output_tokens": 301,
+      "total_tokens": 3870,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:58:05.993256+00:00",
+    "finished_at": "2026-10-05T17:58:21.368091+00:00",
+    "duration_ms": 15375
+  },
+  {
+    "bucket_name": "bucket-case-13",
+    "analysis": {
+      "bucket_name": "bucket-case-13",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias, que é superior a 180 dias. A única regra de transição existente ('transition-it') possui filtro ObjectSizeGreaterThan de 131072 bytes, portanto não possui escopo global. Objetos menores que 128 KB estão sujeitos à expiração em 3650 dias sem nenhuma transição aplicável."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3604,
+      "output_tokens": 222,
+      "total_tokens": 3826,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:01:27.832282+00:00",
+    "finished_at": "2026-10-05T18:01:39.558102+00:00",
+    "duration_ms": 11726
+  },
+  {
+    "bucket_name": "bucket-case-14",
+    "analysis": {
+      "bucket_name": "bucket-case-14",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 4000 dias para versões atuais com escopo global (Filter vazio). A única regra de transição existente ('transition-std-ia') possui filtro restrito ao prefixo 'long-retention/' e tamanho mínimo de 128KB, portanto não há transição de escopo global que atenda objetos sujeitos à expiração global de 4000 dias."
+        },
+        {
+          "codigo": "NC-07",
+          "descricao": "Expiração superior ao limite definido",
+          "justificativa": "A regra 'expire-current' define Expiration.Days igual a 4000, que excede o limite máximo de 3650 dias estabelecido na base de conhecimento."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3626,
+      "output_tokens": 312,
+      "total_tokens": 3938,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:56:56.095041+00:00",
+    "finished_at": "2026-10-05T17:57:08.136957+00:00",
+    "duration_ms": 12042
+  },
+  {
+    "bucket_name": "bucket-case-15",
+    "analysis": {
+      "bucket_name": "bucket-case-15",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias, que é superior a 180 dias. A única regra de transição existente ('transition-it') possui filtro restritivo (prefixo 'large-objects/', tag 'data-class=cold' e tamanho mínimo de 128KB), portanto não há regra de transição de escopo global que cubra os objetos sujeitos à expiração de escopo global."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3658,
+      "output_tokens": 231,
+      "total_tokens": 3889,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:54:03.769988+00:00",
+    "finished_at": "2026-10-05T17:54:15.690323+00:00",
+    "duration_ms": 11920
+  },
+  {
+    "bucket_name": "bucket-case-16",
+    "analysis": {
+      "bucket_name": "bucket-case-16",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias para versões atuais com escopo global (Filter vazio). Não existe nenhuma regra de transição com escopo global que se aplique a esses objetos antes da expiração. A única regra de transição existente ('transition-expiring') está restrita ao prefixo 'research/' e não cobre os demais objetos do bucket."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3598,
+      "output_tokens": 222,
+      "total_tokens": 3820,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:55:41.982570+00:00",
+    "finished_at": "2026-10-05T17:55:53.198556+00:00",
+    "duration_ms": 11216
+  },
+  {
+    "bucket_name": "bucket-case-17",
+    "analysis": {
+      "bucket_name": "bucket-case-17",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias com escopo global (Filter vazio). As únicas regras de transição existentes ('transition-it' e 'transition-cold-archive') possuem filtros com prefixos específicos ('hot/' e 'cold-archive/'), portanto não há transição de escopo global que cubra os objetos sujeitos à expiração de 3650 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3732,
+      "output_tokens": 224,
+      "total_tokens": 3956,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:58:21.368622+00:00",
+    "finished_at": "2026-10-05T17:58:31.991817+00:00",
+    "duration_ms": 10623
+  },
+  {
+    "bucket_name": "bucket-case-18",
+    "analysis": {
+      "bucket_name": "bucket-case-18",
+      "versioning": "Enabled",
+      "conforme": true,
+      "inconformidades": [],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3727,
+      "output_tokens": 68,
+      "total_tokens": 3795,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T18:01:39.558612+00:00",
+    "finished_at": "2026-10-05T18:01:52.496820+00:00",
+    "duration_ms": 12939
+  },
+  {
+    "bucket_name": "bucket-case-19",
+    "analysis": {
+      "bucket_name": "bucket-case-19",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias para versões atuais com escopo global (Filter vazio). A única regra de transição existente ('transition-glacier') possui filtro restrito ao prefixo 'media/' e objetos maiores que 128 KB, portanto não há transição de escopo global que cubra todos os objetos sujeitos à expiração de 3650 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3621,
+      "output_tokens": 223,
+      "total_tokens": 3844,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:57:08.137485+00:00",
+    "finished_at": "2026-10-05T17:57:18.621801+00:00",
+    "duration_ms": 10484
+  },
+  {
+    "bucket_name": "bucket-case-20",
+    "analysis": {
+      "bucket_name": "bucket-case-20",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-11",
+          "descricao": "Transição e expiração no mesmo período",
+          "justificativa": "A regra 'expire-current' define expiração no dia 365 e a regra 'transition-expiring' define transição para GLACIER_IR também no dia 365. Ambas as regras possuem escopos sobrepostos (objetos maiores que 128 KB são afetados por ambas), resultando em transição e expiração ocorrendo no mesmo dia para esses objetos."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3602,
+      "output_tokens": 212,
+      "total_tokens": 3814,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:54:15.690745+00:00",
+    "finished_at": "2026-10-05T17:54:23.553165+00:00",
+    "duration_ms": 7862
+  },
+  {
+    "bucket_name": "bucket-case-21",
+    "analysis": {
+      "bucket_name": "bucket-case-21",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias para versões atuais com escopo global (Filter vazio). A única regra de transição existente ('transition-archive') possui filtro restrito ao prefixo 'legal-records/' e tamanho mínimo de 128KB, portanto não constitui uma transição de escopo global. Objetos fora do prefixo 'legal-records/' ou menores que 128KB permanecerão em STANDARD por 3650 dias sem nenhuma transição aplicável."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3624,
+      "output_tokens": 252,
+      "total_tokens": 3876,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:55:53.199048+00:00",
+    "finished_at": "2026-10-05T17:56:04.639363+00:00",
+    "duration_ms": 11440
+  },
+  {
+    "bucket_name": "bucket-case-22",
+    "analysis": {
+      "bucket_name": "bucket-case-22",
+      "versioning": "Enabled",
+      "conforme": true,
+      "inconformidades": [],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3650,
+      "output_tokens": 68,
+      "total_tokens": 3718,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:58:31.992349+00:00",
+    "finished_at": "2026-10-05T17:58:42.300183+00:00",
+    "duration_ms": 10308
+  },
+  {
+    "bucket_name": "bucket-case-23",
+    "analysis": {
+      "bucket_name": "bucket-case-23",
+      "versioning": "Suspended",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 1825 dias, que é superior a 180 dias. A única regra de transição existente ('transition-it') possui filtro restrito ao prefixo 'api-logs/' e tamanho mínimo de 128 KB, portanto não constitui uma regra de transição de escopo global que cubra os objetos sujeitos à expiração global."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3625,
+      "output_tokens": 221,
+      "total_tokens": 3846,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:54:51.329587+00:00",
+    "finished_at": "2026-10-05T17:55:03.259890+00:00",
+    "duration_ms": 11930
+  },
+  {
+    "bucket_name": "bucket-case-24",
+    "analysis": {
+      "bucket_name": "bucket-case-24",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 3650 dias, que é superior a 180 dias. A única regra de transição existente ('transition-it') possui filtro restrito ao prefixo 'cold-archive/' e tamanho mínimo de 131072 bytes, portanto não há transição de escopo global que cubra os objetos sujeitos à expiração global."
+        },
+        {
+          "codigo": "NC-13",
+          "descricao": "Permanência em STANDARD antes de Intelligent-Tiering",
+          "justificativa": "A regra 'transition-it' configura transição para INTELLIGENT_TIERING no dia 30. Objetos que atendem ao filtro permanecem na classe STANDARD por 30 dias antes da transição, o que excede o limite de 1 dia estabelecido no critério. A referência é transição no dia 0."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3625,
+      "output_tokens": 345,
+      "total_tokens": 3970,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:57:18.622489+00:00",
+    "finished_at": "2026-10-05T17:57:36.127708+00:00",
+    "duration_ms": 17505
+  },
+  {
+    "bucket_name": "bucket-case-25",
+    "analysis": {
+      "bucket_name": "bucket-case-25",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-07",
+          "descricao": "Expiração superior ao limite definido de 3650 dias",
+          "justificativa": "A regra 'expire-current' possui Expiration.Days igual a 3651, que excede o limite máximo de 3650 dias definido para períodos de expiração."
+        },
+        {
+          "codigo": "NC-13",
+          "descricao": "Permanência em STANDARD antes de Intelligent-Tiering superior a um dia",
+          "justificativa": "A regra 'transition-it' realiza transição para INTELLIGENT_TIERING no dia 30. Objetos permanecem na classe STANDARD por 30 dias antes da transição, excedendo o limite de 1 dia. A referência é uma transição para INTELLIGENT_TIERING no dia 0."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3604,
+      "output_tokens": 289,
+      "total_tokens": 3893,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:54:23.553635+00:00",
+    "finished_at": "2026-10-05T17:54:37.677183+00:00",
+    "duration_ms": 14124
+  },
+  {
+    "bucket_name": "bucket-case-26",
+    "analysis": {
+      "bucket_name": "bucket-case-26",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 1825 dias (superior a 180 dias). A única regra de transição existente ('transition-it') possui filtro ObjectSizeGreaterThan de 131072 bytes, portanto não possui escopo global. Objetos menores que 128 KB com expiração em 1825 dias não possuem nenhuma transição aplicável, caracterizando ausência de transição para objetos com expiração superior a 180 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3604,
+      "output_tokens": 240,
+      "total_tokens": 3844,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:56:04.640078+00:00",
+    "finished_at": "2026-10-05T17:56:21.003913+00:00",
+    "duration_ms": 16364
+  },
+  {
+    "bucket_name": "bucket-case-27",
+    "analysis": {
+      "bucket_name": "bucket-case-27",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-02",
+          "descricao": "Ausência de transições com expiração superior a 180 dias",
+          "justificativa": "A regra 'expire-current' define expiração em 1825 dias, que é superior a 180 dias. A única regra de transição existente ('transition-it') possui filtro ObjectSizeGreaterThan de 131072 bytes, portanto não possui escopo global. Objetos menores que 128 KB com expiração em 1825 dias não possuem nenhuma transição aplicável."
+        },
+        {
+          "codigo": "NC-08",
+          "descricao": "Retenção excessiva de versões não atuais",
+          "justificativa": "A regra 'expire-noncurrent' define NoncurrentDays como 31 dias, que é superior ao limite definido de 30 dias."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3604,
+      "output_tokens": 303,
+      "total_tokens": 3907,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:53:24.853422+00:00",
+    "finished_at": "2026-10-05T17:53:40.151307+00:00",
+    "duration_ms": 15298
+  },
+  {
+    "bucket_name": "bucket-case-28",
+    "analysis": {
+      "bucket_name": "bucket-case-28",
+      "versioning": "Enabled",
+      "conforme": false,
+      "inconformidades": [
+        {
+          "codigo": "NC-10",
+          "descricao": "Transições concorrentes identificadas",
+          "justificativa": "As regras 'transition-shared-ia' e 'transition-shared-glacier' possuem filtros com escopos sobrepostos (ambas aplicam-se ao prefixo 'shared/' com ObjectSizeGreaterThan 131072) e ambas definem transição no mesmo dia (Days: 30). Isso significa que os mesmos objetos estariam sujeitos a transições para STANDARD_IA e GLACIER simultaneamente no dia 30, caracterizando transições concorrentes."
+        }
+      ],
+      "possiveis_inconformidades_adicionais": []
+    },
+    "usage": {
+      "input_tokens": 3728,
+      "output_tokens": 231,
+      "total_tokens": 3959,
+      "input_token_details": {
+        "cache_creation": 0,
+        "cache_read": 0
+      }
+    },
+    "model_id": "us.anthropic.claude-opus-4-5-20251101-v1:0",
+    "started_at": "2026-10-05T17:58:42.300663+00:00",
+    "finished_at": "2026-10-05T17:58:51.510696+00:00",
+    "duration_ms": 9210
+  }
+]

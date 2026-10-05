@@ -180,9 +180,7 @@ pip install -r requirements.txt
 ```
 
 Configure credenciais AWS pelo perfil padrão do SDK ou pelas variáveis de
-ambiente e confirme que a conta tem acesso ao modelo Claude Opus 5 no Bedrock.
-O modelo padrão é `anthropic.claude-opus-5`; informe a região explicitamente
-com `--region` ou configure `AWS_REGION`/`AWS_DEFAULT_REGION`.
+ambiente e confirme que a conta tem acesso ao Claude Opus no Bedrock. O modelo padrão é o inference profile regional `us.anthropic.claude-opus-5-5`, pois o foundation model direto não aceita throughput on-demand. Informe a região explicitamente com `--region` ou configure `AWS REGION`/ `AWS_DEFAULT_REGION`. Outro model ID ou inference profile pode ser selecionado com `--model-id`
 
 ### Gerar o script determinístico
 
