@@ -63,10 +63,16 @@ Regras com `Status` igual a `Disabled` não contam como regras ativas.
 
 ---
 
-### NC-02 — Ausência de transições com expiração superior a 180 dias
+### NC-02 — Expiração acima de 180 dias sem transição que a cubra
 
-Verificar se existem regras de expiração superiores a 180 dias sem
-que exista pelo menos uma regra de transição.
+Dispara quando uma regra com `Expiration.Days > 180` não tem uma regra
+de transição cujo escopo contenha o dela: prefixo igual ou mais amplo,
+sem tags adicionais e filtro de tamanho igual ou mais amplo
+(`ObjectSizeGreaterThan` de até 131072 é sempre aceito, pois equivale
+ao padrão do S3; ver NC-09).
+
+Exemplo: expiração global com transição só em `dados/` dispara;
+expiração em `dados/` com transição em `dados/` ou global não dispara.
 
 ---
 
@@ -89,8 +95,14 @@ critério.
 
 ### NC-05 — Ausência de controle sobre Multipart Uploads incompletos
 
-Verificar se existe uma regra para interromper Multipart Uploads
-incompletos dentro do período de até 7 dias.
+Verificar se existe uma regra habilitada com escopo global que
+interrompa Multipart Uploads incompletos dentro do período de até
+7 dias (`AbortIncompleteMultipartUpload.DaysAfterInitiation <= 7`).
+
+O Amazon S3 não permite combinar `AbortIncompleteMultipartUpload` com
+filtros de tag ou de tamanho; portanto, o escopo global exige `Filter`
+ausente, vazio ou com `Prefix` vazio. Uma regra restrita por prefixo
+não satisfaz este critério.
 
 ---
 
@@ -121,9 +133,29 @@ superior ao limite definido de 30 dias.
 ### NC-09 — Transição de objetos menores que 128 KB
 
 Verificar se regras de transição permitem que objetos menores que
-128 KB sejam submetidos à transição.
+128 KB (131072 bytes) sejam submetidos à transição.
 
-A análise deve considerar os filtros de tamanho presentes na regra.
+A análise deve considerar os filtros de tamanho presentes na regra e o
+comportamento padrão de tamanho mínimo da configuração
+(`TransitionDefaultMinimumObjectSize`):
+
+| Valor                      | Comportamento do Amazon S3                                                                               |
+| -------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `all_storage_classes_128K` | Objetos menores que 128 KB não transicionam para nenhuma classe.                                         |
+| `varies_by_storage_class`  | Objetos menores que 128 KB transicionam para `GLACIER` e `DEEP_ARCHIVE`; as demais classes os bloqueiam. |
+| Campo ausente              | Considerar `all_storage_classes_128K`.                                                                   |
+
+Filtros customizados de tamanho sempre têm precedência sobre o
+comportamento padrão. O critério é disparado quando:
+
+- a regra possui `ObjectSizeLessThan` sem `ObjectSizeGreaterThan`, ou
+  `ObjectSizeGreaterThan` menor que 131072; ou
+- a regra não possui filtro de tamanho, a configuração usa
+  `varies_by_storage_class` e a transição é para `GLACIER` ou
+  `DEEP_ARCHIVE`.
+
+Uma transição sem filtro de tamanho sob `all_storage_classes_128K` (ou
+com o campo ausente) não dispara este critério.
 
 ---
 
@@ -155,17 +187,32 @@ Verificar se uma transição para determinada classe de armazenamento
 da duração mínima associada à classe.
 
 O cálculo deve considerar o intervalo entre a transição e a próxima
-ação aplicável ao objeto.
+ação aplicável ao objeto, ou seja, a menor data posterior à transição
+entre as expirações e transições da mesma regra ou de outras regras
+habilitadas com escopo sobreposto.
 
 ---
 
 ### NC-13 — Permanência em STANDARD antes de Intelligent-Tiering
 
-Verificar se uma regra mantém objetos na classe `STANDARD` por mais
-de um dia antes da transição para `INTELLIGENT_TIERING`.
+Verificar se uma regra mantém objetos na classe `STANDARD` antes da
+transição para `INTELLIGENT_TIERING`, ou seja, se existe transição para
+`INTELLIGENT_TIERING` com `Days > 0`.
 
 Uma transição para `INTELLIGENT_TIERING` no dia 0 deve ser considerada
 a referência para essa análise.
+
+---
+
+### NC-14 — Transição para Intelligent-Tiering de objetos de vida curta
+
+Dispara quando uma transição para `INTELLIGENT_TIERING` atinge objetos
+que expiram menos de 30 dias depois
+(`0 < Expiration.Days - Transition.Days < 30`), pois o IT só gera
+economia após 30 dias sem acesso.
+
+Não dispara se a transição for necessária para cobrir, conforme a
+NC-02, uma expiração acima de 180 dias que inclua esses objetos.
 
 ---
 
@@ -187,6 +234,12 @@ do escopo de uma regra.
 Quando um critério exigir uma regra de escopo global, uma regra
 restrita por prefixo, tag ou outro filtro não deve ser considerada
 equivalente.
+
+Uma regra tem escopo global quando `Filter` está ausente, vazio ou
+contém apenas `Prefix` vazio.
+
+Na NC-02, a exigência não é de escopo global, e sim de cobertura do
+escopo de cada expiração, conforme definido no próprio critério.
 
 ### 5.3 Versionamento
 
@@ -225,6 +278,16 @@ as seguintes prioridades:
    novamente o conflito de duração mínima para essa mesma transição.
 3. **NC-10** deve ser avaliada após NC-11 e somente sobre transições que
    não estejam envolvidas em conflito de mesmo dia com expiração.
+4. **NC-11** tem precedência sobre NC-14. Transição e expiração no mesmo
+   dia são classificadas somente como NC-11.
+
+### 5.8 Correção possível
+
+Uma condição só deve ser classificada como inconformidade quando
+existir um ajuste nas regras de Lifecycle que a elimine sem disparar
+outro critério. A única situação sem correção possível prevista nesta
+base é a exceção definida na NC-14. Não aplique esta regra a outros
+critérios por interpretação própria.
 
 ---
 
@@ -237,6 +300,7 @@ Exemplo:
 
 ```json
 {
+  "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
   "Rules": [
     {
       "ID": "regra-01",
@@ -256,6 +320,9 @@ de contexto do bucket, como:
 
 - nome do bucket;
 - estado do versionamento;
+- `TransitionDefaultMinimumObjectSize`, retornado pelo
+  `GetBucketLifecycleConfiguration` (quando ausente, considerar
+  `all_storage_classes_128K`);
 - demais informações necessárias para interpretar as regras.
 
 ---

@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import json
 import sys
+import argparse
 from typing import Any
 
 STORAGE_CLASS_MIN_DAYS = {
@@ -9,443 +11,411 @@ STORAGE_CLASS_MIN_DAYS = {
     "ONEZONE_IA": 30,
     "GLACIER_IR": 90,
     "GLACIER": 90,
+    "GLACIER_FLEXIBLE_RETRIEVAL": 90,
     "DEEP_ARCHIVE": 180,
 }
 
 
-def get_enabled_rules(config: dict) -> list:
-    return [r for r in config.get("Rules", []) if r.get("Status") == "Enabled"]
-
-
-def has_filter(rule: dict) -> bool:
-    f = rule.get("Filter", {})
-    if f is None:
-        return False
+def parse_filter(rule: dict) -> dict:
+    f = rule.get("Filter")
+    result = {"prefix": "", "tags": [], "size_gt": None, "size_lt": None}
     if not f:
-        return False
-    if "Prefix" in f and f["Prefix"] != "":
-        return True
-    if "Tag" in f or "Tags" in f:
-        return True
-    if "And" in f:
-        and_block = f["And"]
-        if and_block.get("Prefix", "") != "":
-            return True
-        if and_block.get("Tags"):
-            return True
-    if "ObjectSizeGreaterThan" in f or "ObjectSizeLessThan" in f:
-        return True
-    if "And" in f:
-        and_block = f["And"]
-        if "ObjectSizeGreaterThan" in and_block or "ObjectSizeLessThan" in and_block:
-            return True
-    return False
-
-
-def is_global_scope(rule: dict) -> bool:
-    return not has_filter(rule)
-
-def get_filter_prefix(rule: dict) -> str:
-    f = rule.get("Filter", {})
-    if not f:
-        return ""
+        return result
     if "Prefix" in f:
-        return f["Prefix"]
-    if "And" in f:
-        return f["And"].get("Prefix", "")
-    return ""
-
-
-def get_filter_tags(rule: dict) -> list:
-    f = rule.get("Filter", {})
-    if not f:
-        return []
-
+        result["prefix"] = f["Prefix"] or ""
     if "Tag" in f:
-        return [f["Tag"]]
-
-    if "Tags" in f:
-        return f["Tags"]
-
-    if "And" in f:
-        return f["And"].get("Tags", [])
-    return []
-
-
-def get_size_filter(rule: dict) -> tuple:
-    f = rule.get("Filter", {})
-    min_size = None
-    max_size = None
-    if not f:
-        return min_size, max_size
+        result["tags"] = [f["Tag"]]
     if "ObjectSizeGreaterThan" in f:
-        min_size = f["ObjectSizeGreaterThan"]
+        result["size_gt"] = f["ObjectSizeGreaterThan"]
     if "ObjectSizeLessThan" in f:
-        max_size = f["ObjectSizeLessThan"]
+        result["size_lt"] = f["ObjectSizeLessThan"]
     if "And" in f:
-        and_block = f["And"]
-        if "ObjectSizeGreaterThan" in and_block:
-            min_size = and_block["ObjectSizeGreaterThan"]
-        if "ObjectSizeLessThan" in and_block:
-            max_size = and_block["ObjectSizeLessThan"]
-    return min_size, max_size
+        a = f["And"]
+        result["prefix"] = a.get("Prefix", "") or ""
+        result["tags"] = a.get("Tags", [])
+        if "ObjectSizeGreaterThan" in a:
+            result["size_gt"] = a["ObjectSizeGreaterThan"]
+        if "ObjectSizeLessThan" in a:
+            result["size_lt"] = a["ObjectSizeLessThan"]
+    return result
 
 
-def prefixes_overlap(p1: str, p2: str) -> bool:
-    return p1.startswith(p2) or p2.startswith(p1)
+def is_global_scope(flt: dict) -> bool:
+    return flt["prefix"] == "" and not flt["tags"] and flt["size_gt"] is None and flt["size_lt"] is None
 
-def tags_overlap(t1: list, t2: list) -> bool:
-    if not t1 or not t2:
+
+def is_global_scope_prefix_only(flt: dict) -> bool:
+    return flt["prefix"] == "" and not flt["tags"]
+
+
+def prefix_contains(outer: str, inner: str) -> bool:
+    return inner.startswith(outer)
+
+
+def tags_subset(outer_tags: list, inner_tags: list) -> bool:
+    inner_set = {(t.get("Key"), t.get("Value")) for t in inner_tags}
+    outer_set = {(t.get("Key"), t.get("Value")) for t in outer_tags}
+    return outer_set <= inner_set
+
+
+def size_filter_covers(outer: dict, inner: dict) -> bool:
+    o_gt = outer["size_gt"]
+    o_lt = outer["size_lt"]
+    i_gt = inner["size_gt"]
+    i_lt = inner["size_lt"]
+    if o_gt is not None and o_gt <= 131072:
+        o_gt = None
+    if i_gt is not None and i_gt <= 131072:
+        i_gt = None
+    if o_gt is None and o_lt is None:
         return True
-    s1 = {(t.get("Key"), t.get("Value")) for t in t1}
-    s2 = {(t.get("Key"), t.get("Value")) for t in t2}
-    return bool(s1 & s2) or not s1 or not s2
+    if o_gt is not None:
+        if i_gt is None:
+            return False
+        if i_gt < o_gt:
+            return False
+    if o_lt is not None:
+        if i_lt is None:
+            return False
+        if i_lt > o_lt:
+            return False
+    return True
 
 
-def filters_overlap(r1: dict, r2: dict) -> bool:
-    p1, p2 = get_filter_prefix(r1), get_filter_prefix(r2)
-    if not prefixes_overlap(p1, p2):
+def filter_covers(outer: dict, inner: dict) -> bool:
+    if not prefix_contains(outer["prefix"], inner["prefix"]):
         return False
-    t1, t2 = get_filter_tags(r1), get_filter_tags(r2)
-    if not tags_overlap(t1, t2):
+    if not tags_subset(outer["tags"], inner["tags"]):
+        return False
+    if not size_filter_covers(outer, inner):
         return False
     return True
 
+
+def filters_overlap(f1: dict, f2: dict) -> bool:
+    t1 = {(t.get("Key"), t.get("Value")) for t in f1["tags"]}
+    t2 = {(t.get("Key"), t.get("Value")) for t in f2["tags"]}
+    for k1, v1 in t1:
+        for k2, v2 in t2:
+            if k1 == k2 and v1 != v2:
+                return False
+    g1 = f1["size_gt"] if f1["size_gt"] is not None else 0
+    g2 = f2["size_gt"] if f2["size_gt"] is not None else 0
+    l1 = f1["size_lt"] if f1["size_lt"] is not None else float("inf")
+    l2 = f2["size_lt"] if f2["size_lt"] is not None else float("inf")
+    low = max(g1, g2)
+    high = min(l1, l2)
+    if low >= high:
+        return False
+    return True
+
+
 def get_transitions(rule: dict) -> list:
-    t = rule.get("Transitions", [])
-    if not t:
-        single = rule.get("Transition")
-        if single:
-            t = [single]
-    return t
-
-
-def get_noncurrent_transitions(rule: dict) -> list:
-    t = rule.get("NoncurrentVersionTransitions", [])
-    if not t:
-        single = rule.get("NoncurrentVersionTransition")
-        if single:
-            t = [single]
-    return t
+    ts = rule.get("Transitions", [])
+    t = rule.get("Transition")
+    if t:
+        ts = ts + [t]
+    return ts
 
 
 def get_expiration_days(rule: dict) -> int | None:
     exp = rule.get("Expiration", {})
-    if not exp:
-        return None
     if "Days" in exp:
         return exp["Days"]
     return None
 
 
 def get_noncurrent_expiration_days(rule: dict) -> int | None:
-    exp = rule.get("NoncurrentVersionExpiration", {})
-    if not exp:
+    nve = rule.get("NoncurrentVersionExpiration", {})
+    if "NoncurrentDays" in nve:
+        return nve["NoncurrentDays"]
+    if "NewerNoncurrentVersions" in nve and "NoncurrentDays" not in nve:
         return None
-    if "NoncurrentDays" in exp:
-        return exp["NoncurrentDays"]
     return None
 
-def get_newer_noncurrent_versions(rule: dict) -> int:
-    exp = rule.get("NoncurrentVersionExpiration", {})  # linha 138 não aparece na foto (inferida)
-    if not exp:
-        return 0
-    return exp.get("NewerNoncurrentVersions", 0)
+
+def get_newer_noncurrent_versions(rule: dict) -> int | None:
+    nve = rule.get("NoncurrentVersionExpiration", {})
+    return nve.get("NewerNoncurrentVersions")
 
 
 def get_abort_days(rule: dict) -> int | None:
-    abort = rule.get("AbortIncompleteMultipartUpload", {})
-    if not abort:
-        return None
-    return abort.get("DaysAfterInitiation")
+    ab = rule.get("AbortIncompleteMultipartUpload", {})
+    return ab.get("DaysAfterInitiation")
 
 
 def has_expired_delete_marker(rule: dict) -> bool:
     exp = rule.get("Expiration", {})
-    if not exp:
-        return False
-    return exp.get("ExpiredObjectDeleteMarker", False)
+    return exp.get("ExpiredObjectDeleteMarker", False) is True
 
 
-def check_nc01(rules: list) -> list:
-    if not rules:
-        return [{"codigo": "NC-01", "descricao": "Ausência de regras de Lifecycle habilitadas."}]
-    return []
-
-
-def check_nc02(rules: list) -> list:
-    has_transition = any(get_transitions(r) or get_noncurrent_transitions(r) for r in rules)
-    for r in rules:
-        exp_days = get_expiration_days(r)
-        if exp_days is not None and exp_days > 180:
-            if not has_transition:
-                return [{"codigo": "NC-02", "descricao": "Expiração superior a 180 dias sem regra de transição."}]
-        nc_exp_days = get_noncurrent_expiration_days(r)
-        if nc_exp_days is not None and nc_exp_days > 180:
-            if not has_transition:
-                return [{"codigo": "NC-02", "descricao": "Expiração de versões não atuais superior a 180 dias sem regra de transição."}]
-    return []
-
-
-def check_nc03(rules: list) -> list:
-    for r in rules:
-        if is_global_scope(r):
-            exp_days = get_expiration_days(r)
-            if exp_days is not None:
-                return []
-            exp = r.get("Expiration", {})
-            if exp and "Date" in exp:
-                return []
-    return [{"codigo": "NC-03", "descricao": "Ausência de expiração para versões atuais com escopo global."}]
-
-def check_nc04(rules: list, versioning: str) -> list:
-    if versioning == "Disabled":
-        return []
-    for r in rules:
-        if is_global_scope(r):
-            nc_exp_days = get_noncurrent_expiration_days(r)
-            if nc_exp_days is not None:
-                newer = get_newer_noncurrent_versions(r)
-                if newer == 0:
-                    return []
-    return [{"codigo": "NC-04", "descricao": "Ausência de expiração para versões não atuais com escopo global."}]
-
-
-def check_nc05(rules: list) -> list:
-    for r in rules:
-        abort_days = get_abort_days(r)
-        if abort_days is not None and abort_days <= 7:
-            return []
-    return [{"codigo": "NC-05", "descricao": "Ausência de controle sobre Multipart Uploads incompletos dentro de 7 dias."}]
-
-
-def check_nc06(rules: list, versioning: str) -> list:
-    if versioning == "Disabled":
-        return []
-    for r in rules:
-        if has_expired_delete_marker(r):
-            return []
-        nc_exp = r.get("NoncurrentVersionExpiration", {})
-        if nc_exp and nc_exp.get("NoncurrentDays") is not None:
-            if has_expired_delete_marker(r):
-                return []
-    for r in rules:
-        if has_expired_delete_marker(r):
-            return []
-    return [{"codigo": "NC-06", "descricao": "Ausência de expiração de Delete Markers."}]
-
-
-def check_nc07(rules: list) -> list:
-    results = []
-    for r in rules:
-        exp_days = get_expiration_days(r)
-        if exp_days is not None and exp_days > 3650:
-            results.append({
-                "codigo": "NC-07",
-                "descricao": f"Regra '{r.get('ID', 'sem ID')}' possui expiração de {exp_days} dias, superior ao limite de 3650 dias."
-            })
-        nc_exp_days = get_noncurrent_expiration_days(r)
-        if nc_exp_days is not None and nc_exp_days > 3650:
-            results.append({
-                "codigo": "NC-07",
-                "descricao": f"Regra '{r.get('ID', 'sem ID')}' possui expiração de versões não atuais de {nc_exp_days} dias, superior ao limite de 3650 dias."
-            })
-    return results
-
-def check_nc08(rules: list) -> list:
-    results = []
-    for r in rules:
-        nc_exp_days = get_noncurrent_expiration_days(r)
-        if nc_exp_days is not None and nc_exp_days > 30:
-            results.append({
-                "codigo": "NC-08",
-                "descricao": f"Regra '{r.get('ID', 'sem ID')}' mantém versões não atuais por {nc_exp_days} dias, superior ao limite de 30 dias."
-            })
-    return results
-
-
-def check_nc09(rules: list) -> list:
-    results = []
-    for r in rules:
-        transitions = get_transitions(r)
-        if transitions:
-            min_size, max_size = get_size_filter(r)
-            if min_size is None or min_size < 128 * 1024:
-                if max_size is None or max_size > 128 * 1024:
-                    results.append({
-                        "codigo": "NC-09",
-                        "descricao": f"Regra '{r.get('ID', 'sem ID')}' permite transição de objetos menores que 128 KB."
-                    })
-    return results
-
-
-def check_nc10(rules: list) -> list:
-    results = []
-    checked = set()
-    for i, r1 in enumerate(rules):
-        t1 = get_transitions(r1)
-        if not t1:
-            continue
-        for j, r2 in enumerate(rules):
-            if i >= j:
-                continue
-            t2 = get_transitions(r2)
-            if not t2:
-                continue
-            if not filters_overlap(r1, r2):
-                continue
-            days1 = {tr.get("Days") for tr in t1 if tr.get("Days") is not None}
-            days2 = {tr.get("Days") for tr in t2 if tr.get("Days") is not None}
-            common = days1 & days2
-            if common:
-                key = tuple(sorted([r1.get("ID", str(i)), r2.get("ID", str(j))]))
-                if key not in checked:
-                    checked.add(key)
-                    results.append({
-                        "codigo": "NC-10",
-                        "descricao": f"Transições concorrentes entre regras '{r1.get('ID', 'sem ID')}' e '{r2.get('ID', 'sem ID')}' no(s) dia(s) {sorted(common)}."
-                    })
-    return results
-
-def check_nc11(rules: list) -> list:
-    results = []
-    for i, r1 in enumerate(rules):
-        t1 = get_transitions(r1)
-        trans_days = {tr.get("Days") for tr in t1 if tr.get("Days") is not None} if t1 else set()
-        for j, r2 in enumerate(rules):
-            exp_days = get_expiration_days(r2)
-            if exp_days is None:
-                continue
-            if i == j:
-                if exp_days in trans_days:
-                    results.append({
-                        "codigo": "NC-11",
-                        "descricao": f"Regra '{r1.get('ID', 'sem ID')}' possui transição e expiração no mesmo dia ({exp_days})."
-                    })
-            else:
-                if filters_overlap(r1, r2) and exp_days in trans_days:
-                    results.append({
-                        "codigo": "NC-11",
-                        "descricao": f"Transição da regra '{r1.get('ID', 'sem ID')}' e expiração da regra '{r2.get('ID', 'sem ID')}' ocorrem no mesmo dia ({exp_days})."
-                    })
-    return results
-
-
-def check_nc12(rules: list) -> list:
-    results = []
-    for r in rules:
-        transitions = get_transitions(r)
-        if not transitions:
-            continue
-        sorted_trans = sorted([t for t in transitions if t.get("Days") is not None], key=lambda x: x["Days"])
-        exp_days = get_expiration_days(r)
-        for idx, tr in enumerate(sorted_trans):
-            tr_days = tr["Days"]
-            tr_class = tr.get("StorageClass", "")
-            min_duration = STORAGE_CLASS_MIN_DAYS.get(tr_class, 0)
-            if min_duration == 0:
-                continue
-            next_action_day = None
-            if idx + 1 < len(sorted_trans):
-                next_action_day = sorted_trans[idx + 1]["Days"]
-            if exp_days is not None:
-                if next_action_day is None or exp_days < next_action_day:
-                    next_action_day = exp_days
-            if next_action_day is not None:
-                if next_action_day - tr_days < min_duration:
-                    results.append({
-                        "codigo": "NC-12",
-                        "descricao": f"Regra '{r.get('ID', 'sem ID')}': transição para {tr_class} no dia {tr_days} seguida de ação no dia {next_action_day}, antes da duração mínima de {min_duration} dias."
-                    })
-    return results
-
-def check_nc13(rules: list) -> list:
-    results = []
-    for r in rules:
-        transitions = get_transitions(r)
-        if not transitions:
-            continue
-        for tr in transitions:
-            if tr.get("StorageClass") == "INTELLIGENT_TIERING":
-                days = tr.get("Days")
-                if days is not None and days > 1:
-                    results.append({
-                        "codigo": "NC-13",
-                        "descricao": f"Regra '{r.get('ID', 'sem ID')}' mantém objetos em STANDARD por {days} dias antes de transição para INTELLIGENT_TIERING."
-                    })
-    return results
-
-
-def analyze(config: dict, bucket_name: str = "", versioning: str = "Enabled") -> dict:
-    rules = get_enabled_rules(config)
+def analyze_bucket(bucket: dict) -> dict:
+    bucket_name = bucket.get("bucket_name", "unknown")
+    versioning = bucket.get("versioning", "Disabled")
+    lc = bucket.get("lifecycle_configuration", bucket)
+    rules_raw = lc.get("Rules", [])
+    default_min_size = lc.get("TransitionDefaultMinimumObjectSize") or bucket.get("TransitionDefaultMinimumObjectSize") or "all_storage_classes_128K"
+    enabled_rules = [r for r in rules_raw if r.get("Status") == "Enabled"]
     inconformidades = []
 
-    nc01 = check_nc01(rules)
-    if nc01:
-        inconformidades.extend(nc01)
-        return {
-            "bucket_name": bucket_name,
-            "versioning": versioning,
-            "inconformidades": inconformidades,
-            "conforme": False,
-        }
+    def add(code: str, desc: str):
+        inconformidades.append({"codigo": code, "descricao": desc})
 
-    inconformidades.extend(check_nc02(rules))
-    inconformidades.extend(check_nc03(rules))
-    inconformidades.extend(check_nc04(rules, versioning))
-    inconformidades.extend(check_nc05(rules))
-    inconformidades.extend(check_nc06(rules, versioning))
-    inconformidades.extend(check_nc07(rules))
-    inconformidades.extend(check_nc08(rules))
-    inconformidades.extend(check_nc09(rules))
-    inconformidades.extend(check_nc11(rules))
-    inconformidades.extend(check_nc12(rules))
-    inconformidades.extend(check_nc10(rules))
-    inconformidades.extend(check_nc13(rules))
+    if not enabled_rules:
+        add("NC-01", "Nenhuma regra de Lifecycle habilitada.")
+        return {"bucket_name": bucket_name, "versioning": versioning, "inconformidades": inconformidades, "conforme": False}
 
-    seen = set()
-    unique = []
-    for inc in inconformidades:
-        key = (inc["codigo"], inc["descricao"])
-        if key not in seen:
-            seen.add(key)
-            unique.append(inc)
+    parsed_rules = []
+    for r in enabled_rules:
+        parsed_rules.append({
+            "id": r.get("ID", ""),
+            "filter": parse_filter(r),
+            "transitions": get_transitions(r),
+            "expiration_days": get_expiration_days(r),
+            "noncurrent_expiration_days": get_noncurrent_expiration_days(r),
+            "newer_noncurrent_versions": get_newer_noncurrent_versions(r),
+            "abort_days": get_abort_days(r),
+            "expired_delete_marker": has_expired_delete_marker(r),
+            "raw": r,
+        })
 
+    for pr in parsed_rules:
+        exp_days = pr["expiration_days"]
+        if exp_days is not None and exp_days > 180:
+            exp_filter = pr["filter"]
+            covered = False
+            for pr2 in parsed_rules:
+                if pr2["transitions"]:
+                    if filter_covers(pr2["filter"], exp_filter):
+                        covered = True
+                        break
+            if not covered:
+                add("NC-02", f"Regra '{pr['id']}' possui expiração em {exp_days} dias sem transição que a cubra.")
+
+    has_global_expiration = any(pr["expiration_days"] is not None and is_global_scope(pr["filter"]) for pr in parsed_rules)
+    if not has_global_expiration:
+        add("NC-03", "Ausência de expiração para versões atuais com escopo global.")
+
+    if versioning != "Disabled":
+        has_global_noncurrent_exp = False
+        for pr in parsed_rules:
+            if pr["noncurrent_expiration_days"] is not None and is_global_scope(pr["filter"]):
+                nnv = pr["newer_noncurrent_versions"]
+                if nnv is None or nnv == 0:
+                    has_global_noncurrent_exp = True
+                    break
+        if not has_global_noncurrent_exp:
+            add("NC-04", "Ausência de expiração para versões não atuais com escopo global.")
+
+    has_global_abort = False
+    for pr in parsed_rules:
+        ab = pr["abort_days"]
+        if ab is not None and ab <= 7:
+            flt = pr["filter"]
+            if is_global_scope_prefix_only(flt) and flt["size_gt"] is None and flt["size_lt"] is None:
+                has_global_abort = True
+                break
+    if not has_global_abort:
+        add("NC-05", "Ausência de controle sobre Multipart Uploads incompletos com escopo global em até 7 dias.")
+
+    if versioning != "Disabled":
+        has_delete_marker_handling = any(pr["expired_delete_marker"] for pr in parsed_rules)
+        if not has_delete_marker_handling:
+            has_noncurrent_exp_global = any(
+                pr["noncurrent_expiration_days"] is not None and is_global_scope(pr["filter"])
+                for pr in parsed_rules
+            )
+            if not has_noncurrent_exp_global:
+                has_delete_marker_handling = False
+            else:
+                has_delete_marker_handling = True
+        if not has_delete_marker_handling:
+            add("NC-06", "Ausência de expiração de Delete Markers.")
+
+    for pr in parsed_rules:
+        if pr["expiration_days"] is not None and pr["expiration_days"] > 3650:
+            add("NC-07", f"Regra '{pr['id']}' possui expiração de versões atuais superior a 3650 dias ({pr['expiration_days']} dias).")
+        if pr["noncurrent_expiration_days"] is not None and pr["noncurrent_expiration_days"] > 3650:
+            add("NC-07", f"Regra '{pr['id']}' possui expiração de versões não atuais superior a 3650 dias ({pr['noncurrent_expiration_days']} dias).")
+
+    for pr in parsed_rules:
+        ncd = pr["noncurrent_expiration_days"]
+        if ncd is not None and ncd > 30:
+            add("NC-08", f"Regra '{pr['id']}' mantém versões não atuais por {ncd} dias, superior ao limite de 30 dias.")
+
+    for pr in parsed_rules:
+        flt = pr["filter"]
+        for t in pr["transitions"]:
+            sc = t.get("StorageClass", "")
+            t_days = t.get("Days")
+            has_custom_size = flt["size_gt"] is not None or flt["size_lt"] is not None
+            if has_custom_size:
+                if flt["size_lt"] is not None and flt["size_gt"] is None:
+                    add("NC-09", f"Regra '{pr['id']}' permite transição de objetos menores que 128 KB (filtro ObjectSizeLessThan sem ObjectSizeGreaterThan).")
+                elif flt["size_gt"] is not None and flt["size_gt"] < 131072:
+                    add("NC-09", f"Regra '{pr['id']}' permite transição de objetos menores que 128 KB (ObjectSizeGreaterThan={flt['size_gt']}).")
+            else:
+                if default_min_size == "varies_by_storage_class" and sc in ("GLACIER", "DEEP_ARCHIVE", "GLACIER_FLEXIBLE_RETRIEVAL"):
+                    add("NC-09", f"Regra '{pr['id']}' permite transição de objetos menores que 128 KB para {sc} sob varies_by_storage_class.")
+
+    nc11_pairs = set()
+    for i, pr1 in enumerate(parsed_rules):
+        for t1 in pr1["transitions"]:
+            d1 = t1.get("Days")
+            if d1 is None:
+                continue
+            for j, pr2 in enumerate(parsed_rules):
+                if i == j:
+                    continue
+                for t2 in pr2["transitions"]:
+                    d2 = t2.get("Days")
+                    if d2 is None:
+                        continue
+                    if d1 == d2 and filters_overlap(pr1["filter"], pr2["filter"]):
+                        pair = tuple(sorted([pr1["id"], pr2["id"]]))
+                        if pair not in nc11_pairs:
+                            add("NC-10", f"Transições concorrentes no dia {d1} entre regras '{pr1['id']}' e '{pr2['id']}'.")
+                            nc11_pairs.add(pair)
+
+    nc11_transitions = set()
+    for pr in parsed_rules:
+        exp_days = pr["expiration_days"]
+        if exp_days is None:
+            continue
+        for t in pr["transitions"]:
+            t_days = t.get("Days")
+            if t_days is not None and t_days == exp_days:
+                add("NC-11", f"Regra '{pr['id']}' possui transição e expiração no mesmo dia ({t_days}).")
+                nc11_transitions.add((pr["id"], t_days, t.get("StorageClass", "")))
+
+    for i, pr1 in enumerate(parsed_rules):
+        for t in pr1["transitions"]:
+            t_days = t.get("Days")
+            if t_days is None:
+                continue
+            for j, pr2 in enumerate(parsed_rules):
+                if i == j:
+                    continue
+                exp2 = pr2["expiration_days"]
+                if exp2 is not None and t_days == exp2 and filters_overlap(pr1["filter"], pr2["filter"]):
+                    key = (pr1["id"], t_days, t.get("StorageClass", ""))
+                    if key not in nc11_transitions:
+                        add("NC-11", f"Transição da regra '{pr1['id']}' no dia {t_days} coincide com expiração da regra '{pr2['id']}'.")
+                        nc11_transitions.add(key)
+
+    for pr in parsed_rules:
+        for t in pr["transitions"]:
+            t_days = t.get("Days")
+            sc = t.get("StorageClass", "")
+            if t_days is None or sc not in STORAGE_CLASS_MIN_DAYS:
+                continue
+            min_stay = STORAGE_CLASS_MIN_DAYS[sc]
+            if min_stay == 0:
+                continue
+            next_action_day = None
+            exp_days = pr["expiration_days"]
+            if exp_days is not None and exp_days > t_days:
+                if (pr["id"], t_days, sc) not in nc11_transitions:
+                    next_action_day = exp_days
+            for t2 in pr["transitions"]:
+                t2_days = t2.get("Days")
+                if t2_days is not None and t2_days > t_days:
+                    if next_action_day is None or t2_days < next_action_day:
+                        next_action_day = t2_days
+            for pr2 in parsed_rules:
+                if pr2["id"] == pr["id"]:
+                    continue
+                if not filters_overlap(pr["filter"], pr2["filter"]):
+                    continue
+                exp2 = pr2["expiration_days"]
+                if exp2 is not None and exp2 > t_days:
+                    if next_action_day is None or exp2 < next_action_day:
+                        next_action_day = exp2
+                for t2 in pr2["transitions"]:
+                    t2_days = t2.get("Days")
+                    if t2_days is not None and t2_days > t_days:
+                        if next_action_day is None or t2_days < next_action_day:
+                            next_action_day = t2_days
+            if next_action_day is not None:
+                stay = next_action_day - t_days
+                if stay < min_stay:
+                    add("NC-12", f"Regra '{pr['id']}' transiciona para {sc} no dia {t_days}, mas próxima ação ocorre no dia {next_action_day} ({stay} dias), inferior à duração mínima de {min_stay} dias.")
+
+    for pr in parsed_rules:
+        for t in pr["transitions"]:
+            sc = t.get("StorageClass", "")
+            t_days = t.get("Days")
+            if sc == "INTELLIGENT_TIERING" and t_days is not None and t_days > 0:
+                add("NC-13", f"Regra '{pr['id']}' mantém objetos em STANDARD por {t_days} dias antes de transicionar para INTELLIGENT_TIERING.")
+
+    for pr in parsed_rules:
+        exp_days = pr["expiration_days"]
+        if exp_days is None:
+            continue
+        for t in pr["transitions"]:
+            sc = t.get("StorageClass", "")
+            t_days = t.get("Days")
+            if sc != "INTELLIGENT_TIERING" or t_days is None:
+                continue
+            diff = exp_days - t_days
+            if 0 < diff < 30:
+                if (pr["id"], t_days, sc) in nc11_transitions:
+                    continue
+                if exp_days > 180:
+                    continue
+                add("NC-14", f"Regra '{pr['id']}' transiciona para INTELLIGENT_TIERING no dia {t_days} com expiração no dia {exp_days} ({diff} dias em IT, inferior a 30).")
+
+    conforme = len(inconformidades) == 0
     return {
         "bucket_name": bucket_name,
         "versioning": versioning,
-        "inconformidades": unique,
-        "conforme": len(unique) == 0,
+        "inconformidades": inconformidades,
+        "conforme": conforme,
     }
 
-def main():
-    if len(sys.argv) < 2:
-        print("Uso: python analyze_s3_lifecycle.py <arquivo_config.json> [bucket_name] [versioning]", file=sys.stderr)
-        sys.exit(1)
-    config_file = sys.argv[1]
-    bucket_name = sys.argv[2] if len(sys.argv) > 2 else ""
-    versioning = sys.argv[3] if len(sys.argv) > 3 else "Enabled"
-    with open(config_file, "r", encoding="utf-8") as f:
-        config = json.load(f)
 
-    if isinstance(config, list):
-        # Entrada em lote: lista de buckets, cada um com bucket_name, versioning e Rules
-        result = [
-            analyze(
-                item,
-                item.get("bucket_name", bucket_name),
-                item.get("versioning", versioning),
-            )
-            for item in config
-        ]
+def main():
+    parser = argparse.ArgumentParser(description="Analisador de políticas de Lifecycle S3")
+    parser.add_argument("input_file", help="Arquivo JSON de entrada")
+    parser.add_argument("--output", "-o", help="Arquivo JSON de saída (opcional)")
+    args = parser.parse_args()
+
+    try:
+        with open(args.input_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(json.dumps({"erro": f"Falha ao ler arquivo de entrada: {e}"}), file=sys.stderr)
+        sys.exit(1)
+
+    is_list = isinstance(data, list)
+    buckets = data if is_list else [data]
+    results = []
+    has_error = False
+
+    for bucket in buckets:
+        try:
+            if not isinstance(bucket, dict):
+                raise ValueError("Entrada de bucket inválida: não é um objeto")
+            if "bucket_name" not in bucket:
+                raise ValueError("Campo 'bucket_name' ausente")
+            result = analyze_bucket(bucket)
+            results.append(result)
+        except Exception as e:
+            has_error = True
+            bn = bucket.get("bucket_name", "unknown") if isinstance(bucket, dict) else "unknown"
+            results.append({"bucket_name": bn, "erro": str(e)})
+
+    output = results if is_list else results[0]
+    output_str = json.dumps(output, ensure_ascii=False, indent=2)
+
+    if args.output:
+        with open(args.output, "w", encoding="utf-8") as f:
+            f.write(output_str)
     else:
-        # Entrada simples: um único bucket (objeto com "Rules")
-        result = analyze(
-            config,
-            config.get("bucket_name", bucket_name),
-            config.get("versioning", versioning),
-        )
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+        print(output_str)
+
+    if has_error:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

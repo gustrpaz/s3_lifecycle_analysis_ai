@@ -6,6 +6,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -34,12 +35,7 @@
         {
           "ID": "transition-std-ia",
           "Status": "Enabled",
-          "Filter": {
-            "And": {
-              "Prefix": "customer-data/",
-              "ObjectSizeGreaterThan": 131072
-            }
-          },
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
           "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
         }
       ]
@@ -61,6 +57,7 @@
     "expected_scenarios": [],
     "versioning": "Disabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -82,9 +79,10 @@
     "scenario": "NC-02",
     "conformity": "non_compliant",
     "expected_scenarios": ["NC-02"],
-    "expected_recommendation": "Adicionar transição para Intelligent-Tiering no dia 0.",
+    "expected_recommendation": "Adicionar transição para Intelligent-Tiering no dia 0 com escopo que cubra o da expiração (global, quando expiração for global).",
     "versioning": "Disabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -136,13 +134,7 @@
         {
           "ID": "transition-glacier",
           "Status": "Enabled",
-          "Filter": {
-            "And": {
-              "Prefix": "analytics/",
-              "Tags": [{ "Key": "retention", "Value": "standard" }],
-              "ObjectSizeGreaterThan": 262144
-            }
-          },
+          "Filter": { "ObjectSizeGreaterThan": 262144 },
           "Transitions": [{ "Days": 90, "StorageClass": "GLACIER_IR" }]
         }
       ]
@@ -156,6 +148,7 @@
     "expected_recommendation": "Adicionar expiração em 3650 dias ou regra de arquivamento sem filtro.",
     "versioning": "Disabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-reports",
@@ -175,8 +168,7 @@
           "Filter": {
             "And": {
               "Prefix": "reports/",
-              "Tags": [{ "Key": "environment", "Value": "production" }],
-              "ObjectSizeGreaterThan": 262144
+              "ObjectSizeGreaterThan": 131072
             }
           },
           "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
@@ -191,6 +183,7 @@
     "expected_scenarios": [],
     "versioning": "Suspended",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -220,11 +213,7 @@
           "ID": "transition-glacier",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "versions/",
-              "Tags": [{ "Key": "tier", "Value": "archive" }],
-              "ObjectSizeGreaterThan": 1048576
-            }
+            "ObjectSizeGreaterThan": 1048576
           },
           "Transitions": [{ "Days": 90, "StorageClass": "GLACIER_IR" }]
         }
@@ -239,6 +228,7 @@
     "expected_recommendation": "Adicionar NoncurrentVersionExpiration em até 30 dias, sem filtro.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -274,6 +264,7 @@
     "expected_scenarios": [],
     "versioning": "Disabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -291,10 +282,7 @@
           "ID": "transition-onezone",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "user-uploads/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "ONEZONE_IA" }]
         }
@@ -306,9 +294,10 @@
     "scenario": "NC-05",
     "conformity": "non_compliant",
     "expected_scenarios": ["NC-05"],
-    "expected_recommendation": "Adicionar AbortIncompleteMultipartUpload com DaysAfterInitiation=7.",
+    "expected_recommendation": "Adicionar AbortIncompleteMultipartUpload com DaysAfterInitiation=7, sem filtro.",
     "versioning": "Disabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -338,6 +327,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -360,17 +350,14 @@
         {
           "ID": "abort-mpu",
           "Status": "Enabled",
-          "Filter": { "Prefix": "uploads/" },
+          "Filter": {},
           "AbortIncompleteMultipartUpload": { "DaysAfterInitiation": 1 }
         },
         {
           "ID": "transition-glacier",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "cold-content/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 90, "StorageClass": "GLACIER" }]
         }
@@ -385,6 +372,7 @@
     "expected_recommendation": "Adicionar Expiration com ExpiredObjectDeleteMarker=true.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -408,10 +396,7 @@
           "ID": "transition-archive",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "compliance-archive/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "DEEP_ARCHIVE" }]
         }
@@ -467,6 +452,7 @@
     "expected_recommendation": "Reduzir a expiração para 3650 dias.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -496,10 +482,7 @@
           "ID": "transition-std-ia",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "long-retention/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
         }
@@ -513,6 +496,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -542,11 +526,7 @@
           "ID": "transition-it",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "large-objects/",
-              "Tags": [{ "Key": "data-class", "Value": "cold" }],
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
         }
@@ -558,9 +538,10 @@
     "scenario": "NC-09",
     "conformity": "non_compliant",
     "expected_scenarios": ["NC-09"],
-    "expected_recommendation": "Adicionar ObjectSizeGreaterThan=131072 ao filtro da regra de transição.",
+    "expected_recommendation": "Ajustar o filtro da regra de transição para ObjectSizeGreaterThan=131072 ao filtro da regra de transição.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -589,7 +570,7 @@
         {
           "ID": "transition-expiring",
           "Status": "Enabled",
-          "Filter": { "Prefix": "research/" },
+          "Filter": { "ObjectSizeGreaterThan": 1024 },
           "Transitions": [{ "Days": 365, "StorageClass": "GLACIER_IR" }]
         }
       ]
@@ -602,6 +583,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -630,9 +612,7 @@
         {
           "ID": "transition-it",
           "Status": "Enabled",
-          "Filter": {
-            "And": { "Prefix": "hot/", "ObjectSizeGreaterThan": 131072 }
-          },
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
           "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
         },
         {
@@ -656,6 +636,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -685,7 +666,7 @@
           "ID": "transition-shared-ia",
           "Status": "Enabled",
           "Filter": {
-            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
         },
@@ -693,7 +674,7 @@
           "ID": "transition-shared-glacier",
           "Status": "Enabled",
           "Filter": {
-            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 120, "StorageClass": "GLACIER" }]
         }
@@ -707,6 +688,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -736,7 +718,7 @@
           "ID": "transition-glacier",
           "Status": "Enabled",
           "Filter": {
-            "And": { "Prefix": "media/", "ObjectSizeGreaterThan": 131072 }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "GLACIER_IR" }]
         }
@@ -792,6 +774,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -821,10 +804,7 @@
           "ID": "transition-archive",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "legal-records/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "DEEP_ARCHIVE" }]
         }
@@ -839,6 +819,7 @@
     "expected_recommendation": "Ajustar a expiração ou a próxima transição para respeitar a duração mínima da classe.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -886,6 +867,7 @@
     "expected_scenarios": [],
     "versioning": "Suspended",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -915,7 +897,7 @@
           "ID": "transition-it",
           "Status": "Enabled",
           "Filter": {
-            "And": { "Prefix": "api-logs/", "ObjectSizeGreaterThan": 131072 }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 0, "StorageClass": "INTELLIGENT_TIERING" }]
         }
@@ -930,6 +912,7 @@
     "expected_recommendation": "Definir Transition.Days=0 para regras de Intelligent-Tiering.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -959,10 +942,7 @@
           "ID": "transition-it",
           "Status": "Enabled",
           "Filter": {
-            "And": {
-              "Prefix": "cold-archive/",
-              "ObjectSizeGreaterThan": 131072
-            }
+            "ObjectSizeGreaterThan": 131072
           },
           "Transitions": [{ "Days": 30, "StorageClass": "INTELLIGENT_TIERING" }]
         }
@@ -977,6 +957,7 @@
     "expected_recommendation": "Reduzir a expiração para 3650 dias e definir a transição para Intelligent-Tiering no dia 0.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -1018,6 +999,7 @@
     "expected_scenarios": [],
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -1060,6 +1042,7 @@
     "expected_recommendation": "Reduzir NoncurrentVersionExpiration.NoncurrentDays para no máximo 30 dias.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -1102,6 +1085,7 @@
     "expected_recommendation": "Consolidar as regras ou remover a transição concorrente menos restritiva.",
     "versioning": "Enabled",
     "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
       "Rules": [
         {
           "ID": "expire-current",
@@ -1130,9 +1114,7 @@
         {
           "ID": "transition-shared-ia",
           "Status": "Enabled",
-          "Filter": {
-            "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
-          },
+          "Filter": { "ObjectSizeGreaterThan": 131072 },
           "Transitions": [{ "Days": 30, "StorageClass": "STANDARD_IA" }]
         },
         {
@@ -1142,6 +1124,360 @@
             "And": { "Prefix": "shared/", "ObjectSizeGreaterThan": 131072 }
           },
           "Transitions": [{ "Days": 30, "StorageClass": "GLACIER" }]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_29",
+    "scenario": "NC-02",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-03"],
+    "expected_recommendation": "Adicionar expiração em 3650 dias ou regra de arquivamento sem filtro.",
+    "versioning": "Disabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+      "Rules": [
+        {
+          "ID": "expire-datasets",
+          "Status": "Enabled",
+          "Filter": {
+            "Prefix": "datasets/"
+          },
+          "Expiration": {
+            "Days": 1825
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "transition-datasets",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "datasets/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [
+            {
+              "Days": 0,
+              "StorageClass": "INTELLIGENT_TIERING"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_30",
+    "scenario": "NC-14",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "Days": 3650
+          }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": {
+            "NoncurrentDays": 30
+          }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "ExpiredObjectDeleteMarker": true
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "expire-tmp",
+          "Status": "Enabled",
+          "Filter": {
+            "Prefix": "tmp/"
+          },
+          "Expiration": {
+            "Days": 7
+          }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "ObjectSizeGreaterThan": 131072
+          },
+          "Transitions": [
+            {
+              "Days": 0,
+              "StorageClass": "INTELLIGENT_TIERING"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_31",
+    "scenario": "NC-02",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-02"],
+    "expected_recommendation": "Adicionar transição para Intelligent-Tiering no dia 0 com escopo que cubra o da expiração (global, quando a expiração for global).",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "Days": 3650
+          }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": {
+            "NoncurrentDays": 30
+          }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "ExpiredObjectDeleteMarker": true
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "transition-dados",
+          "Status": "Enabled",
+          "Filter": {
+            "And": {
+              "Prefix": "dados/",
+              "ObjectSizeGreaterThan": 131072
+            }
+          },
+          "Transitions": [
+            {
+              "Days": 0,
+              "StorageClass": "INTELLIGENT_TIERING"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_32",
+    "scenario": "NC-14",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-14"],
+    "expected_recommendation": "Remover a transição para Intelligent-Tiering ou restringi-la a prefixos ou tags de objetos de vida longa.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "all_storage_classes_128K",
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "Days": 90
+          }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": {
+            "NoncurrentDays": 30
+          }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "ExpiredObjectDeleteMarker": true
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "expire-tmp",
+          "Status": "Enabled",
+          "Filter": {
+            "Prefix": "tmp/"
+          },
+          "Expiration": {
+            "Days": 7
+          }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {
+            "ObjectSizeGreaterThan": 131072
+          },
+          "Transitions": [
+            {
+              "Days": 0,
+              "StorageClass": "INTELLIGENT_TIERING"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_33",
+    "scenario": "NC-09",
+    "conformity": "non_compliant",
+    "expected_scenarios": ["NC-09"],
+    "expected_recommendation": "Adicionar ObjectSizeGreaterThan=131072 ao filtro da regra de transição ou usar TransitionDefaultMinimumObjectSize=all_storage_classes_128K.",
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "varies_by_storage_class",
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "Days": 3650
+          }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": {
+            "NoncurrentDays": 30
+          }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "ExpiredObjectDeleteMarker": true
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "transition-glacier",
+          "Status": "Enabled",
+          "Filter": {},
+          "Transitions": [
+            {
+              "Days": 90,
+              "StorageClass": "GLACIER"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "case_id": "CASE_34",
+    "scenario": "NC-09",
+    "conformity": "compliant",
+    "expected_scenarios": [],
+    "versioning": "Enabled",
+    "lifecycle_configuration": {
+      "TransitionDefaultMinimumObjectSize": "varies_by_storage_class",
+      "Rules": [
+        {
+          "ID": "expire-current",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "Days": 3650
+          }
+        },
+        {
+          "ID": "expire-noncurrent",
+          "Status": "Enabled",
+          "Filter": {},
+          "NoncurrentVersionExpiration": {
+            "NoncurrentDays": 30
+          }
+        },
+        {
+          "ID": "expire-delete-markers",
+          "Status": "Enabled",
+          "Filter": {},
+          "Expiration": {
+            "ExpiredObjectDeleteMarker": true
+          }
+        },
+        {
+          "ID": "abort-mpu",
+          "Status": "Enabled",
+          "Filter": {},
+          "AbortIncompleteMultipartUpload": {
+            "DaysAfterInitiation": 1
+          }
+        },
+        {
+          "ID": "transition-it",
+          "Status": "Enabled",
+          "Filter": {},
+          "Transitions": [
+            {
+              "Days": 0,
+              "StorageClass": "INTELLIGENT_TIERING"
+            }
+          ]
         }
       ]
     }
