@@ -202,7 +202,7 @@ pip install -r requirements.txt
 
 Configure credenciais AWS pelo perfil padrão do SDK ou pelas variáveis de
 ambiente e confirme que a conta tem acesso ao Claude Opus no Bedrock. O modelo é escolhido com `--model-id` (ou pela variável `BEDROCK_MODEL_ID`).
-O benchmark usa o inference profile `us.anthropic.claude-opus-4-5-20251101-v1:0`; passe-o explicitamente nos dois modos para manter a comparabilidade com a primeira rodada. Sem o parâmetro, o orquestrador usa `us.anthropic.claude-opus-5-5`. Informe a região explicitamente com `--region` ou configure `AWS_REGION`/`AWS_DEFAULT_REGION`.
+O benchmark usa o inference profile `us.anthropic.claude-opus-4-5-20251101-v1:0`; passe-o explicitamente nos dois modos para manter a comparabilidade com a primeira rodada. Informe a região explicitamente com `--region` ou configure `AWS_REGION`/`AWS_DEFAULT_REGION`.
 
 ### Gerar o script determinístico
 
