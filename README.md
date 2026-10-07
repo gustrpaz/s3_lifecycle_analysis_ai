@@ -312,27 +312,6 @@ Cada resposta é validada contra o schema definido no prompt antes de ser aceita
 
 Respostas rejeitadas são gravadas com `error` e reprocessadas com `--resume`.
 
-### Comparar os resultados
-
-O `scripts/compare_results.py` cruza as saídas com `datasets/lifecycle_rules_gabarito.json`, sem chamar o Bedrock. Aceita a saída JSON do script e as saídas JSON do orquestrador, uma por execução:
-
-```bash
-python scripts/compare_results.py \
-  --script results/rev/script.json \
-  --genai results/rev/genai_run1.json results/rev/genai_run2.json results/rev/genai_run3.json \
-  --output results/rev/comparacao.md
-```
-
-O relatório traz:
-
-- métricas por fonte: acerto exato, classificação conforme / não conforme, precisão, recall, falsos positivos e negativos e respostas sem resultado;
-- a tabela por cenário, com divergências em negrito;
-- os erros por NC;
-- os cenários em que as fontes divergem entre si;
-- o consumo de tokens e o tempo das chamadas ao modelo.
-
-Respostas rejeitadas pela validação de schema contam como "sem resultado".
-
 ---
 
 ## Saída Esperada por Cenário
